@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Missing Treasury — Kautilyan Crisis Room (5 Scandals)</title>
+<style>
+*{box-sizing:border-box} body{margin:0;font-family:Inter,Arial,sans-serif;background:#0b1020;color:#eef2ff}
+header{padding:28px 6%;background:linear-gradient(135deg,#111936,#1b2450);border-bottom:1px solid #313b68}
+h1{margin:0;font-size:32px}.sub{color:#b8c2e5;margin-top:8px}
+main{max-width:1100px;margin:auto;padding:28px 6%}
+.card{background:#121a31;border:1px solid #29355d;border-radius:16px;padding:22px;margin:18px 0;box-shadow:0 10px 30px #0004}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.metric{font-size:26px;font-weight:700}.label{color:#aeb9dc;font-size:13px;text-transform:uppercase}
+button{background:#e8ecff;color:#111936;border:0;border-radius:10px;padding:12px 18px;font-weight:700;cursor:pointer;margin:5px}
+button:hover{transform:translateY(-1px)} .danger{color:#ffb4b4}.ok{color:#a9f5c0}
+.evidence{display:none}.evidence.active{display:block}
+table{width:100%;border-collapse:collapse}th,td{padding:11px;border-bottom:1px solid #29355d;text-align:left}th{color:#b8c2e5}
+.bar{height:12px;background:#273252;border-radius:20px;overflow:hidden}.fill{height:100%;background:#cbd5ff;transition:width .4s}
+#result{font-size:20px;font-weight:700;margin-top:15px}
+.small{font-size:13px;color:#aeb9dc;line-height:1.6}
+.tag{display:inline-block;padding:6px 10px;border-radius:20px;background:#202b4e;color:#cdd6ff;margin:3px;font-size:12px}
+footer{padding:30px 6%;color:#8995bc;text-align:center}
+.caseGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+.caseCard{background:#0e1630;border:1px solid #29355d;border-radius:14px;padding:16px;cursor:pointer;transition:.15s}
+.caseCard:hover{border-color:#8ea1ff}
+.caseCard.solved{border-color:#7ce6a0}
+.caseCard .num{font-size:12px;color:#8ea1ff;font-weight:700}
+.caseCard .name{font-weight:700;margin:6px 0}
+.caseCard .stat{font-size:12px;color:#aeb9dc}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700;margin-left:6px}
+.badge.solved{background:#183a26;color:#8ef0af}
+.badge.open{background:#2a2140;color:#d9c6ff}
+#scoreboard{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.hidden{display:none}
+.backbtn{background:#202b4e;color:#cdd6ff}
+</style>
+</head>
+<body>
+<header>
+  <h1>THE MISSING TREASURY</h1>
+  <div class="sub">Kautilyan Crisis Room · Concept 15 + Twist 11 · 5 Scandals Edition</div>
+</header>
+
+<main>
+<section class="card" id="intro">
+  <span class="tag">Concept 15 — Escape Room: The Missing Treasury</span>
+  <span class="tag">Twist 11 — Crisis Mode</span>
+  <h2>🚨 Five Financial Scandals, One Night</h2>
+  <p>Five fictional treasuries have each reported an irregularity on the same night. As the on-call investigator, you must reconcile records, inspect evidence, identify the suspicious transaction and recommend a control response — for all five cases.</p>
+  <p class="small">This is an educational simulation. All names, amounts and transactions in every case are fictional.</p>
+  <button onclick="showCaseFiles()">OPEN CASE FILES</button>
+</section>
+
+<section class="card hidden" id="caseFiles">
+  <div id="scoreboard">
+    <h2 style="margin:0">Case Files</h2>
+    <div><span class="label">Cases Solved</span> <span class="metric" id="solvedCount">0 / 5</span></div>
+  </div>
+  <div class="bar" style="margin:10px 0 18px"><div class="fill" id="overallFill" style="width:0%"></div></div>
+  <p class="small">Select a case to investigate. Each case has its own dashboard, evidence room, tribunal decision and control response.</p>
+  <div class="caseGrid" id="caseGrid"></div>
+</section>
+
+<section class="card hidden" id="caseView">
+  <button class="backbtn" onclick="showCaseFiles()">&larr; Back to Case Files</button>
+  <h2 id="caseTitle"></h2>
+  <p id="caseIntro" class="small"></p>
+
+  <div id="dashboard" class="card">
+    <h3>Case Dashboard</h3>
+    <div class="grid" id="dashGrid"></div>
+  </div>
+
+  <div id="evidenceRoom" class="card">
+    <h3>Evidence Room</h3>
+    <p>Select evidence to inspect it. You need enough evidence to reach a defensible conclusion.</p>
+    <div id="evidenceButtons"></div>
+    <div id="evidenceContent"></div>
+  </div>
+
+  <div id="decision" class="card">
+    <h3>Tribunal Decision</h3>
+    <p>What is the most defensible conclusion?</p>
+    <div id="decisionButtons"></div>
+    <div id="result"></div>
+  </div>
+
+  <div id="controls" class="card hidden">
+    <h3>Control Response</h3>
+    <p>Select the strongest immediate response.</p>
+    <div id="controlButtons"></div>
+    <div id="controlResult"></div>
+  </div>
+
+  <div id="caseIks" class="card hidden">
+    <h3>Ancient → Modern Learning Link</h3>
+    <p id="iksText"></p>
+    <h4>Audit Trail</h4>
+    <p class="small" id="auditTrail"></p>
+    <button onclick="showCaseFiles()">Return to Case Files</button>
+  </div>
+</section>
+
+<section class="card hidden" id="finalSection">
+  <h2>🏆 Chief Auditor's Verdict</h2>
+  <p>All five scandals have been investigated. Here is the combined audit trail.</p>
+  <div class="grid">
+    <div class="card"><b>Ancient focus</b><p>Book II of the Arthashastra sets out the akshapatala (records-and-audit office, AS 2.7) and a catalogue of roughly forty ways government servants could embezzle revenue (AS 2.8).</p></div>
+    <div class="card"><b>Modern parallel</b><p>Reconciliation, audit evidence, authorization controls and fraud investigation across five different fraud typologies.</p></div>
+    <div class="card"><b>Artifact application</b><p>Each case isolates a different embezzlement pattern — unapproved payment, fictitious vendor, ghost employee, fake credit note, unsupported reimbursement — and tests the same investigative discipline on each.</p></div>
+  </div>
+  <h3>Final Score</h3>
+  <div class="bar"><div class="fill" id="finalFill" style="width:0%"></div></div>
+  <p><b id="finalScoreText">0 / 100</b></p>
+</section>
+</main>
+
+<footer>
+Educational prototype prepared for IKS in Accounting & Finance · AY 2026–27
+</footer>
+
+<script>
+const CASES = [
+  {
+    id:1,
+    name:"The Missing Treasury",
+    typology:"Unapproved payment",
+    intro:"The main treasury's book balance does not match the bank. One invoice was paid without the required sign-off.",
+    dash:[
+      {label:"Book Balance", value:"₹10,00,000"},
+      {label:"Bank Balance", value:"₹9,25,000"},
+      {label:"Unexplained Difference", value:"₹75,000", danger:true},
+      {label:"Risk Level", value:"HIGH", danger:true}
+    ],
+    evidence:[
+      {id:"cash", title:"📘 Cash Book", rows:[["Opening balance","₹8,00,000"],["Receipts","₹4,00,000"],["Payments","₹2,00,000"],["Closing balance","₹10,00,000"]]},
+      {id:"bank", title:"🏦 Bank Statement", rows:[["Expected closing balance","₹10,00,000"],["Recorded bank balance","₹9,25,000"],["Unmatched debit","₹75,000 ⚠"]]},
+      {id:"invoice", title:"🧾 Invoice Register", header:["Invoice","Supplier","Amount","Status"], rows:[["INV-204","North Star Supplies","₹1,25,000","Verified"],["INV-205","North Star Supplies","₹75,000","No supporting approval ⚠"]]},
+      {id:"approval", title:"🔐 Approval Log", header:["Payment","Required approval","System record"], rows:[["₹75,000","Finance Head","Missing ⚠"]]}
+    ],
+    decisionOptions:[
+      "Ordinary timing difference",
+      "Suspicious ₹75,000 payment requiring investigation",
+      "No issue because the ledger is balanced",
+      "Ignore until year-end"
+    ],
+    correctDecision:1,
+    decisionCorrectText:"Correct. The ₹75,000 payment is an unexplained exception and should be investigated using supporting evidence.",
+    decisionWrongText:"Not the best conclusion. Reconcile the records and investigate the unexplained ₹75,000 difference.",
+    controlOptions:[
+      "Reconcile the payment and obtain independent approval evidence",
+      "Delete the transaction",
+      "Allow the same employee to approve and record it"
+    ],
+    correctControl:0,
+    controlCorrectText:"Correct control response. Reconcile the transaction, obtain independent approval evidence, document the exception and escalate for investigation.",
+    controlWrongText:"This weakens financial control. The suspicious transaction should be independently verified and documented.",
+    iksText:"The unapproved payment mirrors the akshapatala's core check (AS 2.7): every disbursement must reconcile against a recorded authorisation, or it is treated as a potential embezzlement per AS 2.8."
+  },
+  {
+    id:2,
+    name:"The Ghost Vendor",
+    typology:"Fictitious vendor",
+    intro:"A payment went out to a vendor that cannot be found in the verified vendor master, with no purchase order behind it.",
+    dash:[
+      {label:"Book Balance", value:"₹6,40,000"},
+      {label:"Bank Balance", value:"₹5,90,000"},
+      {label:"Unexplained Difference", value:"₹50,000", danger:true},
+      {label:"Risk Level", value:"HIGH", danger:true}
+    ],
+    evidence:[
+      {id:"vendor", title:"🏷️ Vendor Master", header:["Vendor","GSTIN on file","Status"], rows:[["Silverline Traders","Not found","Unregistered ⚠"],["North Star Supplies","Valid","Active"]]},
+      {id:"voucher", title:"💸 Payment Voucher", rows:[["Voucher No.","PV-311"],["Paid to","Silverline Traders"],["Amount","₹50,000"],["Prepared & approved by","Same employee ⚠"]]},
+      {id:"po", title:"📄 Purchase Order Register", rows:[["Matching PO for PV-311","Not found ⚠"],["Goods/service received note","Not found ⚠"]]},
+      {id:"gst", title:"🌐 GST Portal Check", rows:[["GSTIN quoted on invoice","22AAAAA0000A1Z5"],["Portal lookup result","Invalid / does not exist ⚠"]]}
+    ],
+    decisionOptions:[
+      "Ordinary timing difference",
+      "Payment to a fictitious, unverified vendor requiring investigation",
+      "No issue, since a voucher exists",
+      "Ignore, the amount is small"
+    ],
+    correctDecision:1,
+    decisionCorrectText:"Correct. An unregistered vendor with no PO and an invalid GSTIN is a classic fictitious-vendor pattern.",
+    decisionWrongText:"Not the best conclusion. A vendor missing from the master with no PO and an invalid GSTIN is a strong fraud signal.",
+    controlOptions:[
+      "Freeze further payments, verify the vendor's GSTIN/PAN/bank account independently before releasing any funds",
+      "Pay the next invoice from the same vendor as usual",
+      "Let the employee who created the vendor also approve future payments"
+    ],
+    correctControl:0,
+    controlCorrectText:"Correct control response. Independent vendor verification and payment freeze pending investigation prevents further loss.",
+    controlWrongText:"This weakens control. A suspected fictitious vendor must be independently verified before any further payment.",
+    iksText:"This case reflects one of the AS 2.8 embezzlement categories: payment against a non-existent supply. The akshapatala's registers exist precisely to catch a name in the books with no genuine counterparty."
+  },
+  {
+    id:3,
+    name:"The Payroll Padding",
+    typology:"Ghost employee",
+    intro:"The payroll run cost more than expected. One employee code appears to draw a duplicate salary.",
+    dash:[
+      {label:"Book Balance", value:"₹12,00,000"},
+      {label:"Bank Balance", value:"₹11,55,000"},
+      {label:"Unexplained Difference", value:"₹45,000", danger:true},
+      {label:"Risk Level", value:"HIGH", danger:true}
+    ],
+    evidence:[
+      {id:"payroll", title:"🧮 Payroll Register", header:["Emp. Code","Name","Amount"], rows:[["E-118","R. Kadam","₹45,000"],["E-118B","R. Kadam","₹45,000 ⚠ duplicate"]]},
+      {id:"hr", title:"👤 HR Master", rows:[["Record for E-118","On file"],["Record for E-118B","Not found ⚠"]]},
+      {id:"attendance", title:"🕒 Biometric Attendance Log", rows:[["E-118 check-ins this month","22 days"],["E-118B check-ins this month","0 — never logged in ⚠"]]},
+      {id:"bankcredit", title:"🏦 Bank Credit List", rows:[["Account credited for E-118","XXXX-4410"],["Account credited for E-118B","XXXX-4410 ⚠ same account"]]}
+    ],
+    decisionOptions:[
+      "Two different employees, no issue",
+      "A ghost-employee salary duplication requiring investigation",
+      "System glitch, safe to ignore",
+      "Reverse next month automatically"
+    ],
+    correctDecision:1,
+    decisionCorrectText:"Correct. A second code with no HR record, zero attendance, and the same bank account as a real employee is a ghost-employee scheme.",
+    decisionWrongText:"Not the best conclusion. A duplicate code with no HR record and zero attendance paid into the same account is a ghost-employee red flag.",
+    controlOptions:[
+      "Cross-verify payroll against HR master and biometric attendance every cycle; suspend the duplicate code and recover the amount",
+      "Keep paying both codes since the amounts match",
+      "Ask the payroll preparer to investigate their own entry"
+    ],
+    correctControl:0,
+    controlCorrectText:"Correct control response. Independent cross-verification against HR and attendance, plus recovery, closes the gap.",
+    controlWrongText:"This weakens control. The preparer of a suspect entry should never be the one investigating it.",
+    iksText:"Kautilya's rule that no single officer both disburses and records funds (echoed in the akshapatala's segregation, AS 2.7) is exactly the safeguard a payroll-vs-HR-vs-attendance cross-check restores here."
+  },
+  {
+    id:4,
+    name:"The Round-Trip Refund",
+    typology:"Fake credit note / skimming",
+    intro:"A large customer refund was recorded, but the matching goods return cannot be traced in stock records.",
+    dash:[
+      {label:"Book Balance", value:"₹8,80,000"},
+      {label:"Bank Balance", value:"₹8,20,000"},
+      {label:"Unexplained Difference", value:"₹60,000", danger:true},
+      {label:"Risk Level", value:"HIGH", danger:true}
+    ],
+    evidence:[
+      {id:"creditnote", title:"🧾 Credit Note Register", rows:[["Credit note","CN-118"],["Reason","Damaged goods return"],["Amount","₹60,000"],["Customer","Meridian Retail"]]},
+      {id:"stock", title:"📦 Sales & Stock Return Register", rows:[["Matching stock-in entry for CN-118","Not found ⚠"],["Damaged-goods inspection report","Not found ⚠"]]},
+      {id:"bankdebit", title:"🏦 Bank Statement", rows:[["Refund debited against CN-118","₹60,000 ⚠"]]},
+      {id:"customer", title:"📞 Customer Confirmation", rows:[["Meridian Retail states","Never returned goods or received a refund ⚠"]]}
+    ],
+    decisionOptions:[
+      "Genuine customer return, no issue",
+      "A fake credit note used to divert ₹60,000 in cash, requiring investigation",
+      "Balanced because a credit note exists",
+      "Write it off as a bad debt"
+    ],
+    correctDecision:1,
+    decisionCorrectText:"Correct. No stock return, no inspection report, and the customer denying it all point to a fabricated credit note used to skim cash.",
+    decisionWrongText:"Not the best conclusion. With no stock movement and the customer denying the transaction, the credit note itself is suspect.",
+    controlOptions:[
+      "Reconcile every credit note to an actual stock return and get independent customer confirmation before refunding",
+      "Approve future credit notes from the same employee without checks",
+      "Destroy the credit note to close the discrepancy"
+    ],
+    correctControl:0,
+    controlCorrectText:"Correct control response. Matching credit notes to physical stock returns and independent customer confirmation prevents this diversion route.",
+    controlWrongText:"This weakens control or destroys evidence. Every credit note needs independent verification against stock and the customer.",
+    iksText:"This mirrors an AS 2.8 embezzlement category built on falsified documentation — a real-looking entry with no real transaction behind it, the same gap the akshapatala's cross-checked registers are designed to expose."
+  },
+  {
+    id:5,
+    name:"The Petty Cash Sleight",
+    typology:"Unsupported reimbursement",
+    intro:"The petty cash imprest was fully vouched for on paper, but several receipts behind the vouchers are missing.",
+    dash:[
+      {label:"Imprest Balance", value:"₹50,000"},
+      {label:"Vouchers Submitted", value:"₹50,000"},
+      {label:"Unsupported Claims", value:"₹18,000", danger:true},
+      {label:"Risk Level", value:"MEDIUM–HIGH", danger:true}
+    ],
+    evidence:[
+      {id:"pettybook", title:"📗 Petty Cash Book", rows:[["Total vouchers this cycle","₹50,000"],["Vouchers with original receipts attached","₹32,000"],["Vouchers with no receipt","₹18,000 ⚠"]]},
+      {id:"receipts", title:"🧾 Receipts Folder", rows:[["Receipts for 3 travel vouchers","Missing ⚠"],["Vendor stamp on remaining receipts","Present"]]},
+      {id:"vendorconfirm", title:"📞 Vendor Confirmation", rows:[["Taxi vendor confirms fare for one trip","₹1,200"],["Amount claimed for same trip","₹4,500 ⚠"]]},
+      {id:"pettyapproval", title:"🔐 Approval Log", rows:[["Petty cash prepared by","Employee A"],["Petty cash approved by","Employee A ⚠ same person"]]}
+    ],
+    decisionOptions:[
+      "All vouchers are fine since the imprest reconciles on paper",
+      "Unsupported and inflated reimbursement claims requiring investigation",
+      "Petty cash is too small to matter",
+      "Approve and reset the imprest as usual"
+    ],
+    correctDecision:1,
+    decisionCorrectText:"Correct. Missing receipts, an inflated fare versus the vendor's own confirmation, and self-approval together point to misappropriation.",
+    decisionWrongText:"Not the best conclusion. Missing receipts and a vendor-confirmed inflated claim are signs of misappropriation, however small the amount looks.",
+    controlOptions:[
+      "Require original receipts for every voucher and separate the preparer from the approver; recover the unsupported amount",
+      "Let the same employee continue to prepare and approve petty cash",
+      "Round up the imprest to cover future gaps quietly"
+    ],
+    correctControl:0,
+    controlCorrectText:"Correct control response. Original-receipt requirements plus segregation of preparer and approver close this small but real leak.",
+    controlWrongText:"This weakens control. Preparer/approver segregation and original receipts are exactly what this case is missing.",
+    iksText:"Even a small-value leak fits Kautilya's warning that a government servant handling cash 'cannot but taste a bit of the king's revenue' (AS 2.8) — which is why segregation of duties, not trust, is the standing control."
+  }
+];
+
+let solved = {};
+let currentCase = null;
+
+function showCaseFiles(){
+  document.getElementById('intro').classList.add('hidden');
+  document.getElementById('caseView').classList.add('hidden');
+  document.getElementById('finalSection').classList.add('hidden');
+  document.getElementById('caseFiles').classList.remove('hidden');
+  renderCaseGrid();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderCaseGrid(){
+  const grid = document.getElementById('caseGrid');
+  grid.innerHTML = '';
+  CASES.forEach(c=>{
+    const done = !!solved[c.id];
+    const div = document.createElement('div');
+    div.className = 'caseCard' + (done ? ' solved':'');
+    div.onclick = ()=>openCase(c.id);
+    div.innerHTML = `<div class="num">CASE ${c.id}</div>
+      <div class="name">${c.name}</div>
+      <div class="stat">${c.typology}</div>
+      <span class="badge ${done?'solved':'open'}">${done?'✔ Solved':'Open'}</span>`;
+    grid.appendChild(div);
+  });
+  const count = Object.keys(solved).length;
+  document.getElementById('solvedCount').textContent = count + ' / 5';
+  document.getElementById('overallFill').style.width = (count/5*100)+'%';
+  if(count===5){ showFinal(); }
+}
+
+function openCase(id){
+  currentCase = CASES.find(c=>c.id===id);
+  document.getElementById('caseFiles').classList.add('hidden');
+  document.getElementById('caseView').classList.remove('hidden');
+  document.getElementById('caseTitle').textContent = 'Case ' + currentCase.id + ': ' + currentCase.name;
+  document.getElementById('caseIntro').textContent = currentCase.intro;
+
+  const dashGrid = document.getElementById('dashGrid');
+  dashGrid.innerHTML = '';
+  currentCase.dash.forEach(d=>{
+    dashGrid.innerHTML += `<div><div class="label">${d.label}</div><div class="metric ${d.danger?'danger':''}">${d.value}</div></div>`;
+  });
+
+  const evBtns = document.getElementById('evidenceButtons');
+  evBtns.innerHTML = '';
+  const evContent = document.getElementById('evidenceContent');
+  evContent.innerHTML = '';
+  currentCase.evidence.forEach(ev=>{
+    const b = document.createElement('button');
+    b.textContent = ev.title.replace(/^[^\s]+\s/,'');
+    b.onclick = ()=>showEvidence(ev.id);
+    evBtns.appendChild(b);
+    const div = document.createElement('div');
+    div.id = 'ev_'+ev.id;
+    div.className = 'evidence card';
+    let tbl = '<table>';
+    if(ev.header){ tbl += '<tr>'+ev.header.map(h=>'<th>'+h+'</th>').join('')+'</tr>'; }
+    ev.rows.forEach(r=>{ tbl += '<tr>'+r.map(cell=>'<td>'+String(cell).replace('⚠','<span class="danger">⚠</span>')+'</td>').join('')+'</tr>'; });
+    tbl += '</table>';
+    div.innerHTML = `<h4>${ev.title}</h4>${tbl}`;
+    evContent.appendChild(div);
+  });
+
+  const decBtns = document.getElementById('decisionButtons');
+  decBtns.innerHTML = '';
+  currentCase.decisionOptions.forEach((opt,i)=>{
+    const b = document.createElement('button');
+    b.textContent = String.fromCharCode(65+i)+'. '+opt;
+    b.onclick = ()=>answer(i);
+    decBtns.appendChild(b);
+  });
+  document.getElementById('result').innerHTML = '';
+
+  const ctrlBtns = document.getElementById('controlButtons');
+  ctrlBtns.innerHTML = '';
+  currentCase.controlOptions.forEach((opt,i)=>{
+    const b = document.createElement('button');
+    b.textContent = opt;
+    b.onclick = ()=>control(i);
+    ctrlBtns.appendChild(b);
+  });
+  document.getElementById('controlResult').innerHTML = '';
+  document.getElementById('controls').classList.add('hidden');
+  document.getElementById('caseIks').classList.add('hidden');
+
+  window.scrollTo({top:document.getElementById('caseView').offsetTop,behavior:'smooth'});
+}
+
+function showEvidence(id){
+  document.querySelectorAll('.evidence').forEach(x=>x.classList.remove('active'));
+  document.getElementById('ev_'+id).classList.add('active');
+}
+
+function answer(i){
+  const r = document.getElementById('result');
+  if(i === currentCase.correctDecision){
+    r.innerHTML = '<span class="ok">'+currentCase.decisionCorrectText+'</span>';
+    document.getElementById('controls').classList.remove('hidden');
+  } else {
+    r.innerHTML = '<span class="danger">'+currentCase.decisionWrongText+'</span>';
+  }
+}
+
+function control(i){
+  const r = document.getElementById('controlResult');
+  if(i === currentCase.correctControl){
+    r.innerHTML = '<p class="ok"><b>'+currentCase.controlCorrectText+'</b></p>';
+    const iks = document.getElementById('caseIks');
+    iks.classList.remove('hidden');
+    document.getElementById('iksText').textContent = currentCase.iksText;
+    document.getElementById('auditTrail').textContent =
+      `Case ${currentCase.id} opened → evidence inspected → exception identified → suspicious transaction confirmed → control response accepted.`;
+    solved[currentCase.id] = true;
+  } else {
+    r.innerHTML = '<p class="danger">'+currentCase.controlWrongText+'</p>';
+  }
+}
+
+function showFinal(){
+  document.getElementById('caseFiles').classList.add('hidden');
+  document.getElementById('caseView').classList.add('hidden');
+  document.getElementById('finalSection').classList.remove('hidden');
+  const score = Math.min(100, Object.keys(solved).length*20);
+  document.getElementById('finalFill').style.width = score+'%';
+  document.getElementById('finalScoreText').textContent = score + ' / 100 — All scandals investigated';
+}
+</script>
+</body>
+</html>
